@@ -15,11 +15,119 @@ from ..Utils.joint_utils import *
 
 def objective_master_relaxedIK(x):
     vars = get_groove_global_vars()
+    
+    ################################# Overwrite Joints #################################
+    # This is where the joints are actually overwritten
+    # x is the hypothetical joint state vector which the solver has proposed
+    # We are replacing the elements of x that we know to be fixed, or controlled by the gamepad
+    # We know that the values of x are in joint_order order, so we find the name of the joints we need to replace, then replace the corresponding index of x
+    for i,name in enumerate(vars.overwrite_joints):
+        index = vars.joint_order.index(name)
+        x[index] = vars.overwrite_joint_values[i]
+    #####################################################################################
+    
     vars.frames = vars.robot.getFrames(x)
 
     return objective_master(x)
 
 ########################################################################################################################
+# Define our camera location goal objectives here
+
+class Arm0_Look_At_Obj(Objective):
+    def __init__(self, *args): pass
+    def isVelObj(self): return False
+    def name(self): return 'Look_At'
+
+    def __call__(self, x, vars):
+        arm0_chain = vars.frames[0]    # index determines which chain to get (arm0 = camera arm)
+        arm0_positions = arm0_chain[0] # each chain is a tuple of (positions, rotations)
+        arm0_rotations = arm0_chain[1]
+        camPos = arm0_positions[-1]    # positions is an array of 1 x 3 arrays, each an [x,y,z] position of a link in the chain
+                                       # The last link is the position of the camera 
+                                       # on 9 Jan, found that it's a little further than right_hand. How is this calculated? 
+                                       # I compared the value here at init_state with the value shown in RVIZ in urdf_viewer.launch. 
+                                       # Should they be the same? They aren't.
+        
+        focal_length = 1               # This is the length of the "viewing segment", which is the area we want the manipulation hand to be at
+                                       # This objective returns the same score no matter where along this viewing segment the manipulation hand is located
+                                       
+        camFrame = arm0_rotations[-1]  # rotations is an array of 3x3 matrices that represent the rotation of a link in the chain w.r.t. the base
+        
+        # This endpoint defines the viewing segment as a segment of length focal_length extending along the z-axis of the camera link
+        camEndpoint = camPos + focal_length*(camFrame[:,2]/np.linalg.norm(camFrame[:,2]))
+        
+        
+        arm1_chain = vars.frames[1]    # index determines which chain to get (arm1 = manipulation arm)
+        arm1_positions = arm1_chain[0] # each chain is a tuple of (positions, rotations)
+        arm1_rotations = arm1_chain[1]
+        manPos = arm1_positions[-1]    # positions is an array of 1 x 3 arrays, each an [x,y,z] position of a link in the chain
+
+        # Distance from a point to a line
+        # Set A = camera position, B = manipulator position, C = endpoint of viewing segment
+        # distance of point B from segment AC  = |AB X BC| / |AC|
+        endpoint_dis = np.subtract(manPos,camEndpoint)  
+        inv_endpoint_dis = np.subtract(camEndpoint, manPos)
+        between_hands = np.subtract(manPos,camPos)
+        camera_axis = np.subtract(camEndpoint, camPos)
+        inv_camera_axis = np.subtract(camPos, camEndpoint)
+
+        x_val = np.linalg.norm(np.cross(between_hands, endpoint_dis))/ focal_length
+        check_close = np.dot(camera_axis, between_hands)/(focal_length * np.linalg.norm(between_hands))
+        check_far = np.dot(inv_camera_axis, endpoint_dis)/(focal_length * np.linalg.norm(inv_endpoint_dis))
+        
+        if check_close > 0 and check_far > 0:
+            pass
+        elif check_close <= 0 and check_far > 0:
+            x_val =  np.linalg.norm(between_hands)
+        elif check_close > 0 and check_far <= 0:
+            x_val = np.linalg.norm(inv_endpoint_dis)
+        
+        # print x_val
+        t = 0.0
+        d = 2.0
+        c = .1
+        f = 10
+        g = 2
+        return (-math.e ** ((-(x_val - t) ** d) / (2.0 * c ** 2)) ) + f * (x_val - t) ** g
+        
+class Arm0_High(Objective):
+    def __init__(self, *args): pass
+    def isVelObj(self): return False
+    def name(self): return 'Arm_High'
+
+    def __call__(self, x, vars):
+        arm0_chain = vars.frames[0]    # index determines which chain to get (arm0 = camera arm)
+        arm0_positions = arm0_chain[0] # each chain is a tuple of (positions, rotations)
+        camPos = arm0_positions[-1]    # this is the [x,y,z] position of the camera
+        
+        x_val = camPos[2]
+        # print x_val
+        t = 0.7 # ideal value of x_val
+        d = 2.0 # power of exponential numerator, keep at 2 
+        c = .2 # exponential denominator, determines width of reward region
+        f = 0.2 # determines width of transitional polynomial
+        g = 2 # power of transitional polynomial
+        return (-math.e ** ((-(x_val - t) ** d) / (2.0 * c ** 2)) ) + f * (x_val - t) ** g
+        
+class Roll_Limit(Objective):
+    def __init__(self, *args): pass
+    def isVelObj(self): return False
+    def name(self): return 'Roll_Limit'
+
+    def __call__(self, x, vars):    
+        arm0_chain = vars.frames[0]    # index determines which chain to get (arm0 = camera arm)
+        arm0_rotations = arm0_chain[1]
+        camFrame = arm0_rotations[-1]
+        
+        x_val = np.dot(camFrame[:,0], [0,0,1])
+        # print x_val
+        t = 0.0 # ideal value of x_val
+        d = 2.0 # power of exponential numerator, keep at 2 
+        c = 0.1 # exponential denominator, determines width of reward region
+        f = 1.0 # determines width of transitional polynomial
+        g = 2 # power of transitional polynomial
+        return (-math.e ** ((-(x_val - t) ** d) / (2.0 * c ** 2)) ) + f * (x_val - t) ** g    
+#########################################################################################################################
 
 class Position_Obj(Objective):
     def __init__(self, *args): pass
@@ -28,9 +136,10 @@ class Position_Obj(Objective):
 
     def __call__(self, x, vars):
         # positions = vars.arm.getFrames(x)[0]
-        positions = vars.frames[0]
+        arm_num = 1
+        positions = vars.frames[arm_num][0] # This line returns an array of [x,y,z] positions, one position for each robot joint including origin and ee     
         eePos = positions[-1]
-        goal_pos = vars.goal_pos
+        goal_pos = vars.goal_positions[arm_num]
         diff = (eePos - goal_pos)
         norm_ord = 2
         x_val = np.linalg.norm(diff, ord=norm_ord)
@@ -80,10 +189,11 @@ class Orientation_Obj(Objective):
     def name(self): return 'Orientation'
 
     def __call__(self, x, vars):
-        frames = vars.frames[1]
+        arm_num = 1
+        frames = vars.frames[arm_num][1]
         eeMat = frames[-1]
 
-        goal_quat = vars.goal_quat
+        goal_quat = vars.goal_quats[arm_num]
         new_mat = np.zeros((4, 4))
         new_mat[0:3, 0:3] = eeMat
         new_mat[3, 3] = 1

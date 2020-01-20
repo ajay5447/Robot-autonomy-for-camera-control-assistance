@@ -50,6 +50,10 @@ if __name__ == '__main__':
     counter = 0.0
     stride = 0.08
     idx = 0
+    
+    js = JointState()
+    js.name = joint_ordering
+    js.position = [-0.296825, -0.88549, 1.14512, 1.59227, -0.622029, 1.08337, -3.01887, -0.0636602, -0.944932, -1.19574, 1.71614, 0.674952, 1.01434, 2.47738]
     while not rospy.is_shutdown():
         c = math.cos(counter)
         s = 0.2
@@ -64,7 +68,11 @@ if __name__ == '__main__':
             else:
                 goal_pos.append([0,0,0])
 
-        xopt = relaxedIK.solve(goal_pos, goal_quat)
+
+        overwrite_joints = ['left_s0', 'left_s1', 'left_e0', 'left_e1', 'left_w0', 'left_w1', 'left_w2']
+        overwrite_joint_values = js.position[7:]
+        
+        xopt = relaxedIK.solve(goal_pos, goal_quat, overwrite_joints, overwrite_joint_values)
 
         js = joint_state_define(xopt)
         if js == None:

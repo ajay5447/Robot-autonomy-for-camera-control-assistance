@@ -14,7 +14,15 @@ import rospy
 import os
 from sklearn.externals import joblib
 
-
+################# Changes Made ################################
+# Updated objectives to fit needs for TRINA autonomous camera system
+# weight_funcs, weight_priors updated to match new objective functions
+# also changed position and rotation mode to absolute (relative is w.r.t. starting config, which has no particular value in our application)
+# additional objectives: 
+    # Position_MultiEE_Obj() (weight func = Identity_Weight(), weight_prior = 50.0), 
+    # Orientation_MultiEE_Obj() (weight func = Identity_Weight(), weight_prior = 40.0)
+    # Position_Obj(), (weight_func = Identity_Weight(), weight_prior = 50.0)
+    # Orientation_Obj(), (weight_func = Identity_Weight(), weight_prior =  40.0)
 
 class RelaxedIK_vars(Vars):
     def __init__(self, name,
@@ -25,11 +33,11 @@ class RelaxedIK_vars(Vars):
                  objective_function=objective_master_relaxedIK,
                  full_arms=[],
                  init_state=6*[0],
-                 rotation_mode = 'relative',  # could be 'absolute' or 'relative'
-                 position_mode = 'relative',
-                 objectives=(Position_MultiEE_Obj(), Orientation_MultiEE_Obj(), Min_Jt_Vel_Obj(),Min_Jt_Accel_Obj(),Min_Jt_Jerk_Obj(), Joint_Limit_Obj(), Collision_Avoidance_nn()),
-                 weight_funcs=(Identity_Weight(), Identity_Weight(), Identity_Weight(),Identity_Weight(),Identity_Weight(), Identity_Weight(), Identity_Weight()),
-                 weight_priors=(50.0,40.0,0.3,0.3,0.3,1.0,2.0),
+                 rotation_mode = 'absolute',  # could be 'absolute' or 'relative'
+                 position_mode = 'absolute',
+                 objectives=(Arm0_Look_At_Obj(), Arm0_High(), Roll_Limit(), Min_Jt_Vel_Obj(),Min_Jt_Accel_Obj(),Min_Jt_Jerk_Obj(), Joint_Limit_Obj(), Collision_Avoidance_nn()),
+                 weight_funcs=( Identity_Weight(), Identity_Weight(), Identity_Weight(), Identity_Weight(),Identity_Weight(),Identity_Weight(), Identity_Weight(), Identity_Weight()),
+                 weight_priors=( 50.0, 15.0, 50.0, 0.3,0.3,0.3,1.0,2.0),
                  constraints=(),
                  bounds=(),
                  collision_file='',
@@ -165,6 +173,16 @@ class RelaxedIK_vars(Vars):
         self.prev_goal_quats2 = self.goal_quats
         self.prev_goal_quats = self.goal_quats
         self.frames = self.robot.getFrames(self.init_state)
+        
+        ######### Test point ###############################
+        # This is a good spot to do some troubleshooting and print out the self.frames object to figure out exactly what it is
+        #####################################################
+        
+        ############### Initialize Overwrite Joints ###############
+        self.overwrite_joints = []
+        self.overwrite_joint_values = []
+        ###########################################################
+        
         self.joint_limit_obj_value = 0.0
 
         self.init_ee_positions = self.robot.get_ee_positions(self.init_state)

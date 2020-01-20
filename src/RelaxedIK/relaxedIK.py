@@ -49,7 +49,7 @@ class RelaxedIK(object):
         return RelaxedIK(vars)
 
 
-    def solve(self, goal_positions, goal_quats, prev_state=None, vel_objectives_on=True, unconstrained=True, verbose_output=False, max_iter=11, maxtime=.05, rand_start=False):
+    def solve(self, goal_positions, goal_quats, overwrite_joints=[], overwrite_joint_values=[], prev_state=None, vel_objectives_on=True, unconstrained=True, verbose_output=False, max_iter=11, maxtime=.05, rand_start=False):
 
         if self.vars.rotation_mode == 'relative':
             self.vars.goal_quats = []
@@ -78,6 +78,14 @@ class RelaxedIK(object):
             self.vars.goal_positions = []
             for i, p in enumerate(goal_positions):
                 self.vars.goal_positions.append(np.array(p))
+                
+      ########### Joint Overwrite ###########################################
+      # TODO: If this is solving for only half of a robot (one arm), it should not try to optimize the arm that is already set, because it is being controlled by a gamepad
+      
+        self.overwrite_joints = overwrite_joints
+        self.overwrite_joint_values = overwrite_joint_values
+      
+      #######################################################################
 
         if prev_state == None:
             initSol = self.vars.xopt
@@ -97,6 +105,16 @@ class RelaxedIK(object):
             raise Exception('Invalid optimization package in relaxedIK.  Valid inputs are [scipy] and [nlopt].  Exiting.')
         ################################################################################################################
 
+        ########## Joint Overwrite ########################################
+        # If joints were overwritten, the Groove solver doesn't know that. Overwrite its solution to include the current joint state of the un-controlled arm
+        # This overwritten state will be preserved as the "previous solution", so future calculations can start from this actual configuration of the robot
+        
+        for i,name in enumerate(self.vars.overwrite_joints):
+            index = self.vars.joint_order.index(name)
+            xopt[index] = self.vars.overwrite_joint_values[i]
+            
+        ##################################################################
+        
         xopt = self.filter.filter(xopt)
         self.vars.relaxedIK_vars_update(xopt)
 
