@@ -19,13 +19,28 @@ We are actively supporting and extending this code, so we are interested to hear
 or negative experiences in using it.
 '''
 ######################################################################################################
+'''
+steps!
+cd ~/iml-internal/Ebolabot/UI/TaskGenerators/relaxed_ik/build
+source devel/setup.bash
+Start the node with the following command:
+roslaunch relaxed_ik relaxed_ik.launch
+roslaunch relaxed_ik sample.launch
 
+
+roslaunch relaxed_ik urdf_viewer.launch
+
+
+
+Your RelaxedIK solver is ready to go!  To see sample output, run the following command:
+
+'''
 
 # Step-by-step guide starts here!
 
 ######################################################################################################
 # NOTE: IF YOU ALREADY HAVE A PRE-MADE RelaxedIK CONFIG FILE, MAKE SURE THIS IS IN THE RelaxedIK/Config
-#   DIRECTORY, AND FEEL FREE TO SKIP TO STEP 7a.
+#   DIRECTORY, AND FEEL FREE TO SKIP TO STEP 7a. 
 ######################################################################################################
 
 
@@ -51,14 +66,14 @@ or negative experiences in using it.
 # Step 1b: Please set the following variable to the file name of your robot urdf.  For example, for the
 #   ur5 robot urdf already in the urdfs folder, this variable would read 'ur5.urdf'
 #   ex: urdf_file_name = 'ur5.urdf'
-urdf_file_name = ''
+urdf_file_name = 'baxter_base_hb.urdf'
 ######################################################################################################
 
 
 ######################################################################################################
 # Step 1c: Please provide the fixed frame name.  This will be the root link name in the urdf
 #   ex: fixed_frame  = 'base_link'
-fixed_frame = ''
+fixed_frame = 'base'
 ######################################################################################################
 
 
@@ -85,7 +100,10 @@ fixed_frame = ''
 #                'LEFT_WRIST_PITCH', 'LEFT_WRIST_YAW_2'] ]
 #   example 2 shows what this would be for a single end-effector robot, specifically using the UR5 robot
 #   ex2: [ ['shoulder_pan_joint', 'shoulder_lift_joint', 'elbow_joint', 'wrist_1_joint', 'wrist_2_joint', 'wrist_3_joint'] ]
-joint_names = [ ]
+joint_names = [ ['torso_t0', 'right_torso_arm_mount', 'right_s0', 'right_s1', 'right_e0', 'right_e1', 'right_w0', 'right_w1', 'right_w2'], 
+                ['torso_t0', 'left_torso_arm_mount', 'left_s0', 'left_s1', 'left_e0', 'left_e1', 'left_w0', 'left_w1', 'left_w2'] ]
+                
+                # 
 ######################################################################################################
 
 
@@ -105,7 +123,7 @@ joint_names = [ ]
 #   ex1: [ 'WAIST', 'RIGHT_SHOULDER_PITCH', 'RIGHT_SHOULDER_ROLL', 'RIGHT_SHOULDER_YAW', 'RIGHT_ELBOW', 'RIGHT_WRIST_YAW',
 #               'RIGHT_WRIST_PITCH', 'RIGHT_WRIST_YAW_2','LEFT_SHOULDER_PITCH', 'LEFT_SHOULDER_ROLL', 'LEFT_SHOULDER_YAW',
 #               'LEFT_ELBOW', 'LEFT_WRIST_YAW', 'LEFT_WRIST_PITCH', 'LEFT_WRIST_YAW_2' ]
-joint_ordering = [ ]
+joint_ordering = ['right_s0', 'right_s1', 'right_e0', 'right_e1', 'right_w0', 'right_w1', 'right_w2', 'left_s0', 'left_s1', 'left_e0', 'left_e1', 'left_w0', 'left_w1', 'left_w2']
 ######################################################################################################
 
 
@@ -120,7 +138,8 @@ joint_ordering = [ ]
 #   ex1: ee_fixed_joints = ['RIGHT_HAND', 'LEFT_HAND']
 #   For example 2, using the UR5, this is a single chain robot, so it will only have a single end-effector joint
 #   ex2: ee_fixed_joints = ['ee_fixed_joint']
-ee_fixed_joints = [ ]
+ee_fixed_joints = ['right_hand', 'left_hand']
+# 
 ######################################################################################################
 
 
@@ -130,7 +149,9 @@ ee_fixed_joints = [ ]
 #   The configuration should be a single list of values for each joint's rotation (in radians) adhering
 #   to the joint order you specified in Step 3b
 #   ex: starting_config = [ 3.12769839, -0.03987385, -2.07729916, -1.03981438, -1.58652782, -1.5710159 ]
-starting_config = [ ]
+starting_config = [-0.296825, -0.88549, 1.14512, 1.59227, -0.622029, 1.08337, -3.01887, -0.0636602, -0.944932, -1.19574, 1.71614, 0.674952, 1.01434, 2.47738]
+#0.240277207355736, -0.0003125999999995521, 0.0, -0.00010840000000000155, 0.0, -6.462112780614149e-05, 0.0, 0.0, -0.0003125999999995521, 0.0, -0.00010840000000000155, 0.0, -6.462112780614149e-05, 0.0]
+# 0.0, -0.296825, -0.88549, 1.14512, 1.59227, -0.622029, 1.08337, -3.01887, -0.0636602, -0.944932, -1.19574, 1.71614, 0.674952, 1.01434, 2.47738
 ######################################################################################################
 
 
@@ -260,9 +281,21 @@ def joint_state_define(x):
 #
 #   Please provide the name of the collision file that you have been filling out in the RelaxedIK/Config directory:
 #   ex: collision_file_name = 'collision.yaml'
-collision_file_name = ''
+collision_file_name = 'collision_file.yaml'
 ###########################################################################################################
-
+'''
+    - name: box1
+    parameters: [2.0,2.0,0.25] # r
+    coordinate_frame: 0
+    rotation: [0.0,0.0,0.0]
+    translation: [0.5,0.0,0.0]
+    
+    - name: sphere1
+    parameters: .02
+    coordinate_frame: 9
+    rotation: [0,0,0]
+    translation: [0.115,0.025,-0.053] 
+'''
 
 
 ######################################################################################################
@@ -298,7 +331,7 @@ collision_file_name = ''
 #   RelaxedIK/Config directory.
 #   Please provide the name of the file that you renamed your config file to
 #   ex: config_file_name = 'ur5.config'
-config_file_name = ''
+config_file_name = 'second_victory.config'
 ######################################################################################################
 
 
