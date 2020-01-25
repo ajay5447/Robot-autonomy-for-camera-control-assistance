@@ -35,9 +35,9 @@ class RelaxedIK_vars(Vars):
                  init_state=6*[0],
                  rotation_mode = 'absolute',  # could be 'absolute' or 'relative'
                  position_mode = 'absolute',
-                 objectives=(Arm0_Look_At_Obj(), Arm0_High(), Roll_Limit(), Min_Jt_Vel_Obj(),Min_Jt_Accel_Obj(),Min_Jt_Jerk_Obj(), Joint_Limit_Obj(), Collision_Avoidance_nn()),
-                 weight_funcs=( Identity_Weight(), Identity_Weight(), Identity_Weight(), Identity_Weight(),Identity_Weight(),Identity_Weight(), Identity_Weight(), Identity_Weight()),
-                 weight_priors=( 50.0, 15.0, 50.0, 0.3,0.3,0.3,1.0,2.0),
+                 objectives=(Arm0_Look_At_Obj(), Arm0_High(), Roll_Limit(), Away_From_Head(), Dist_To_Target(), Min_Jt_Vel_Obj(),Min_Jt_Accel_Obj(),Min_Jt_Jerk_Obj(), Joint_Limit_Obj(), Collision_Avoidance_nn()),
+                 weight_funcs=(Identity_Weight(), Identity_Weight(), Identity_Weight(), Identity_Weight(), Identity_Weight(), Identity_Weight(),Identity_Weight(),Identity_Weight(), Identity_Weight(), Identity_Weight()),
+                 weight_priors=( 100.0 , 40.0, 100.0, 60.0, 30.0, 0.3, 0.3, 0.3, 1.0, 2.0),
                  constraints=(),
                  bounds=(),
                  collision_file='',

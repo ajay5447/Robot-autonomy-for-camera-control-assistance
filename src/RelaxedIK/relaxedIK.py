@@ -82,9 +82,9 @@ class RelaxedIK(object):
       ########### Joint Overwrite ###########################################
       # TODO: If this is solving for only half of a robot (one arm), it should not try to optimize the arm that is already set, because it is being controlled by a gamepad
       
-        self.overwrite_joints = overwrite_joints
-        self.overwrite_joint_values = overwrite_joint_values
-      
+        self.vars.overwrite_joints = overwrite_joints
+        self.vars.overwrite_joint_values = overwrite_joint_values
+
       #######################################################################
 
         if prev_state == None:
@@ -108,7 +108,7 @@ class RelaxedIK(object):
         ########## Joint Overwrite ########################################
         # If joints were overwritten, the Groove solver doesn't know that. Overwrite its solution to include the current joint state of the un-controlled arm
         # This overwritten state will be preserved as the "previous solution", so future calculations can start from this actual configuration of the robot
-        
+
         for i,name in enumerate(self.vars.overwrite_joints):
             index = self.vars.joint_order.index(name)
             xopt[index] = self.vars.overwrite_joint_values[i]

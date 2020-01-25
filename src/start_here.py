@@ -21,13 +21,18 @@ or negative experiences in using it.
 ######################################################################################################
 '''
 steps!
-cd ~/iml-internal/Ebolabot/UI/TaskGenerators/relaxed_ik/build
+cd ~/ros_ws/src/relaxed_ik/build
 source devel/setup.bash
+cd ~/ros_ws/
+source devel/setup.sh
+
 Start the node with the following command:
-roslaunch relaxed_ik relaxed_ik.launch
 roslaunch relaxed_ik sample.launch
 
+or 
+roslaunch relaxed_ik relaxed_ik.launch
 
+or
 roslaunch relaxed_ik urdf_viewer.launch
 
 

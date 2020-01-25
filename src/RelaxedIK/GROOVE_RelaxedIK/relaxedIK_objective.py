@@ -47,6 +47,8 @@ class Arm0_Look_At_Obj(Objective):
                                        # on 9 Jan, found that it's a little further than right_hand. How is this calculated? 
                                        # I compared the value here at init_state with the value shown in RVIZ in urdf_viewer.launch. 
                                        # Should they be the same? They aren't.
+        #print 'trying to look at location:'
+        #print camPos
         
         focal_length = 1               # This is the length of the "viewing segment", which is the area we want the manipulation hand to be at
                                        # This objective returns the same score no matter where along this viewing segment the manipulation hand is located
@@ -61,13 +63,21 @@ class Arm0_Look_At_Obj(Objective):
         arm1_positions = arm1_chain[0] # each chain is a tuple of (positions, rotations)
         arm1_rotations = arm1_chain[1]
         manPos = arm1_positions[-1]    # positions is an array of 1 x 3 arrays, each an [x,y,z] position of a link in the chain
+        
+        gripper_length = 0.15               # This is the length of the "viewing segment", which is the area we want the manipulation hand to be at
+                                       # This objective returns the same score no matter where along this viewing segment the manipulation hand is located
+                                       
+        manFrame = arm1_rotations[-1]  # rotations is an array of 3x3 matrices that represent the rotation of a link in the chain w.r.t. the base
+        
+        # This endpoint defines the viewing segment as a segment of length focal_length extending along the z-axis of the camera link
+        manEndpoint = manPos + gripper_length*(manFrame[:,2]/np.linalg.norm(manFrame[:,2]))
 
         # Distance from a point to a line
         # Set A = camera position, B = manipulator position, C = endpoint of viewing segment
         # distance of point B from segment AC  = |AB X BC| / |AC|
-        endpoint_dis = np.subtract(manPos,camEndpoint)  
-        inv_endpoint_dis = np.subtract(camEndpoint, manPos)
-        between_hands = np.subtract(manPos,camPos)
+        endpoint_dis = np.subtract(manEndpoint,camEndpoint)  
+        inv_endpoint_dis = np.subtract(camEndpoint, manEndpoint)
+        between_hands = np.subtract(manEndpoint,camPos)
         camera_axis = np.subtract(camEndpoint, camPos)
         inv_camera_axis = np.subtract(camPos, camEndpoint)
 
@@ -102,7 +112,7 @@ class Arm0_High(Objective):
         
         x_val = camPos[2]
         # print x_val
-        t = 0.7 # ideal value of x_val
+        t = 0.5 # ideal value of x_val
         d = 2.0 # power of exponential numerator, keep at 2 
         c = .2 # exponential denominator, determines width of reward region
         f = 0.2 # determines width of transitional polynomial
@@ -118,8 +128,11 @@ class Roll_Limit(Objective):
         arm0_chain = vars.frames[0]    # index determines which chain to get (arm0 = camera arm)
         arm0_rotations = arm0_chain[1]
         camFrame = arm0_rotations[-1]
-        
-        x_val = np.dot(camFrame[:,0], [0,0,1])
+        if np.dot(camFrame[:,0], [0,0,1]) < 0:
+            bonus_score = 100
+        else:
+            bonus_score = 0
+        x_val = np.dot(camFrame[:,1], [0,0,1]) + bonus_score
         # print x_val
         t = 0.0 # ideal value of x_val
         d = 2.0 # power of exponential numerator, keep at 2 
@@ -127,6 +140,54 @@ class Roll_Limit(Objective):
         f = 1.0 # determines width of transitional polynomial
         g = 2 # power of transitional polynomial
         return (-math.e ** ((-(x_val - t) ** d) / (2.0 * c ** 2)) ) + f * (x_val - t) ** g    
+        
+class Away_From_Head(Objective):
+    def __init__(self, *args): pass
+    def isVelObj(self): return False
+    def name(self): return 'Away_From_Head'
+
+    def __call__(self, x, vars):    
+        arm0_chain = vars.frames[0]    # index determines which chain to get (arm0 = camera arm)
+        arm0_rotations = arm0_chain[1]
+        camFrame = arm0_rotations[-1]
+        if np.dot(camFrame[:,2], [0,1,0]) < 0:
+            bonus_score = 100
+        else:
+            bonus_score = 0
+        
+        x_val = np.dot(camFrame[:,2], [0,1,0]) + bonus_score
+        # print x_val
+        t = 1.0 # ideal value of x_val
+        d = 2.0 # power of exponential numerator, keep at 2 
+        c = 0.1 # exponential denominator, determines width of reward region
+        f = 1.0 # determines width of transitional polynomial
+        g = 2 # power of transitional polynomial
+        return (-math.e ** ((-(x_val - t) ** d) / (2.0 * c ** 2)) ) + f * (x_val - t) ** g    
+        
+class Dist_To_Target(Objective):
+    def __init__(self, *args): pass
+    def isVelObj(self): return False
+    def name(self): return 'Distance_To_Target'
+
+    def __call__(self, x, vars):    
+        arm0_chain = vars.frames[0]    # index determines which chain to get (arm0 = camera arm)
+        arm0_positions = arm0_chain[0] # each chain is a tuple of (positions, rotations)
+        camPos = arm0_positions[-1]    # this is the [x,y,z] position of the camera
+        
+        arm1_chain = vars.frames[1]    # index determines which chain to get (arm1 = manipulation arm)
+        arm1_positions = arm1_chain[0] # each chain is a tuple of (positions, rotations)
+        arm1_rotations = arm1_chain[1]
+        manPos = arm1_positions[-1]    # positions is an array of 1 x 3 arrays, each an [x,y,z] position of a link in the chain
+        
+        diff = manPos - camPos
+        norm_ord = 2
+        x_val = np.linalg.norm(diff, ord=norm_ord)
+        t = 0.5 # ideal value of x_val
+        d = 2.0 # power of exponential numerator, keep at 2 
+        c = 0.1 # exponential denominator, determines width of reward region
+        f = 10.0 # determines width of transitional polynomial
+        g = 2 # power of transitional polynomial
+        return (-math.e ** ((-(x_val - t) ** d) / (2.0 * c ** 2)) ) + f * (x_val - t) ** g 
 #########################################################################################################################
 
 class Position_Obj(Objective):
