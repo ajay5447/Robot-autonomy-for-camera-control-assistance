@@ -182,7 +182,7 @@ class Dist_To_Target(Objective):
         diff = manPos - camPos
         norm_ord = 2
         x_val = np.linalg.norm(diff, ord=norm_ord)
-        t = 0.5 # ideal value of x_val
+        t = 0.6 # ideal value of x_val
         d = 2.0 # power of exponential numerator, keep at 2 
         c = 0.1 # exponential denominator, determines width of reward region
         f = 10.0 # determines width of transitional polynomial
