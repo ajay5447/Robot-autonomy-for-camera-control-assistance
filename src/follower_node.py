@@ -23,10 +23,10 @@ from sensor_msgs.msg import JointState
 #    global eepg
 #    eepg = data
 left_joint_values = JointState()
-left_joints = ['left_s0', 'left_s1', 'left_e0', 'left_e1', 'left_w0', 'left_w1', 'left_w2']
-right_joints = ['right_s0', 'right_s1', 'right_e0', 'right_e1', 'right_w0', 'right_w1', 'right_w2']
-pos_goals = []
-quat_goals = []
+left_joints = ['leftjoint_1', 'leftjoint_2', 'leftjoint_3', 'leftjoint_4', 'leftjoint_5', 'leftjoint_6', 'leftjoint_7']
+right_joints = ['rightjoint_1', 'rightjoint_2', 'rightjoint_3', 'rightjoint_4', 'rightjoint_5', 'rightjoint_6', 'rightjoint_7']
+pos_goals = [[0.5,0.5,0.5],[-0.5,-0.5,-0.5]]
+quat_goals = [[1,0,0,0],[1,0,0,0]]
 
 def callback_pose(data):
      global left_joint_values
@@ -45,8 +45,15 @@ if __name__ == '__main__':
     angles_pub = rospy.Publisher('/relaxed_ik/joint_angle_solutions',JointState ,queue_size=3)
     rospy.Subscriber('/robot/joint_states', JointState, callback_pose)
 
-    config_file_name = 'second_victory.config' #rospy.get_param('config_file_name', default='second_victory.config')
+    config_file_name = 'kinova_two_arm.config' #rospy.get_param('config_file_name', default='second_victory.config')
     my_relaxedIK = RelaxedIK.init_from_config(config_file_name)
+
+    my_relaxedIK.vars.weight_funcs[0].set_value(0.0)
+    my_relaxedIK.vars.weight_funcs[1].set_value(0.0)
+
+
+    print(my_relaxedIK.vars.weight_funcs[0].get_value(),my_relaxedIK.vars.weight_funcs[1].get_value(),)
+
     num_chains = my_relaxedIK.vars.robot.numChains
 
     rate = rospy.Rate(100)

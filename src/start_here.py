@@ -71,14 +71,14 @@ Your RelaxedIK solver is ready to go!  To see sample output, run the following c
 # Step 1b: Please set the following variable to the file name of your robot urdf.  For example, for the
 #   ur5 robot urdf already in the urdfs folder, this variable would read 'ur5.urdf'
 #   ex: urdf_file_name = 'ur5.urdf'
-urdf_file_name = 'baxter_base_hb.urdf'
+urdf_file_name = 'kinova_two_arm.urdf'
 ######################################################################################################
 
 
 ######################################################################################################
 # Step 1c: Please provide the fixed frame name.  This will be the root link name in the urdf
 #   ex: fixed_frame  = 'base_link'
-fixed_frame = 'base'
+fixed_frame = 'world'
 ######################################################################################################
 
 
@@ -105,8 +105,8 @@ fixed_frame = 'base'
 #                'LEFT_WRIST_PITCH', 'LEFT_WRIST_YAW_2'] ]
 #   example 2 shows what this would be for a single end-effector robot, specifically using the UR5 robot
 #   ex2: [ ['shoulder_pan_joint', 'shoulder_lift_joint', 'elbow_joint', 'wrist_1_joint', 'wrist_2_joint', 'wrist_3_joint'] ]
-joint_names = [ ['torso_t0', 'right_torso_arm_mount', 'right_s0', 'right_s1', 'right_e0', 'right_e1', 'right_w0', 'right_w1', 'right_w2'], 
-                ['torso_t0', 'left_torso_arm_mount', 'left_s0', 'left_s1', 'left_e0', 'left_e1', 'left_w0', 'left_w1', 'left_w2'] ]
+joint_names = [ ['world_to_rightroot', 'rightjoint_1', 'rightjoint_2', 'rightjoint_3', 'rightjoint_4', 'rightjoint_5', 'rightjoint_6', 'rightjoint_7', 'rightend_effector'], 
+                ['world_to_leftroot', 'leftjoint_1', 'leftjoint_2', 'leftjoint_3', 'leftjoint_4', 'leftjoint_5', 'leftjoint_6', 'leftjoint_7', 'leftend_effector'] ]
                 
                 # 
 ######################################################################################################
@@ -128,7 +128,7 @@ joint_names = [ ['torso_t0', 'right_torso_arm_mount', 'right_s0', 'right_s1', 'r
 #   ex1: [ 'WAIST', 'RIGHT_SHOULDER_PITCH', 'RIGHT_SHOULDER_ROLL', 'RIGHT_SHOULDER_YAW', 'RIGHT_ELBOW', 'RIGHT_WRIST_YAW',
 #               'RIGHT_WRIST_PITCH', 'RIGHT_WRIST_YAW_2','LEFT_SHOULDER_PITCH', 'LEFT_SHOULDER_ROLL', 'LEFT_SHOULDER_YAW',
 #               'LEFT_ELBOW', 'LEFT_WRIST_YAW', 'LEFT_WRIST_PITCH', 'LEFT_WRIST_YAW_2' ]
-joint_ordering = ['right_s0', 'right_s1', 'right_e0', 'right_e1', 'right_w0', 'right_w1', 'right_w2', 'left_s0', 'left_s1', 'left_e0', 'left_e1', 'left_w0', 'left_w1', 'left_w2']
+joint_ordering = ['rightjoint_1', 'rightjoint_2', 'rightjoint_3', 'rightjoint_4', 'rightjoint_5', 'rightjoint_6', 'rightjoint_7', 'leftjoint_1', 'leftjoint_2', 'leftjoint_3', 'leftjoint_4', 'leftjoint_5', 'leftjoint_6', 'leftjoint_7']
 ######################################################################################################
 
 
@@ -143,7 +143,7 @@ joint_ordering = ['right_s0', 'right_s1', 'right_e0', 'right_e1', 'right_w0', 'r
 #   ex1: ee_fixed_joints = ['RIGHT_HAND', 'LEFT_HAND']
 #   For example 2, using the UR5, this is a single chain robot, so it will only have a single end-effector joint
 #   ex2: ee_fixed_joints = ['ee_fixed_joint']
-ee_fixed_joints = ['right_hand', 'left_hand']
+ee_fixed_joints = ['rightend_effector', 'leftend_effector']
 # 
 ######################################################################################################
 
@@ -336,7 +336,7 @@ collision_file_name = 'collision_file.yaml'
 #   RelaxedIK/Config directory.
 #   Please provide the name of the file that you renamed your config file to
 #   ex: config_file_name = 'ur5.config'
-config_file_name = 'second_victory.config'
+config_file_name = 'relaxedIK.config'
 ######################################################################################################
 
 

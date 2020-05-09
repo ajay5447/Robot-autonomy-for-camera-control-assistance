@@ -15,3 +15,17 @@ class Weight_Function:
 class Identity_Weight(Weight_Function):
     def name(self): return 'Identity_weight'
     def __call__(self, vars): return 1.0
+
+class Dynamic_Weight(Weight_Function):
+
+    def __init__(self):
+        self.value = 1.0
+
+    def name(self): return 'Dynamic_weight'
+
+    def __call__(self, vars): return self.value
+
+    def set_value(self,new_value):
+        self.value = new_value
+    def get_value(self):
+        return self.value
