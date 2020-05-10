@@ -501,7 +501,7 @@
     </inertial>
   </link>
   <joint name="fixed_camera" type="fixed">
-    <origin rpy="0 -1.57 0" xyz="0 0 0"/>
+    <origin rpy="0 -1.57 3.14" xyz="0 0 0"/>
     <parent link="rightend_effector_link"/>
     <child link="camera"/>
   </joint>
