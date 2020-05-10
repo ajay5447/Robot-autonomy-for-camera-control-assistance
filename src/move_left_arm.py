@@ -1,7 +1,5 @@
 #! /usr/bin/env python
-'''
-
-'''
+__author__ = "_r_"
 ######################################################################################################
 
 from start_here import urdf_file_name, joint_names, joint_ordering, ee_fixed_joints, starting_config, \
