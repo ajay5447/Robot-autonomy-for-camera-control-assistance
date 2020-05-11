@@ -42,6 +42,7 @@ class RelaxedIK(object):
         self.fixed_ee_joints = self.config_data[4]
         self.joint_order = self.config_data[5]
         self.urdf_path = self.config_data[6]
+        self.urdf_path = dirname + '/urdfs/'+ self.urdf_path.split("/")[-1]
         self.collision_file = self.config_data[7]
 
         vars = RelaxedIK_vars(self.robot_name,self.urdf_path,self.full_joint_lists,self.fixed_ee_joints,self.joint_order,

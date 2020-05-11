@@ -5,7 +5,7 @@ __author__ = "_r_"
 from start_here import urdf_file_name, joint_names, joint_ordering, ee_fixed_joints, starting_config, \
     joint_state_define, collision_file_name, fixed_frame, config_file_name
 from RelaxedIK.relaxedIK import RelaxedIK
-from relaxed_ik.msg import EEPoseGoals
+# from relaxed_ik.msg import EEPoseGoals
 from geometry_msgs.msg import Pose
 from sensor_msgs.msg import JointState
 from trajectory_msgs.msg import JointTrajectory, JointTrajectoryPoint
