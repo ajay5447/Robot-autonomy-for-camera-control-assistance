@@ -32,8 +32,8 @@ class MultiplexerInterface(object):
         self.right_js_pub = rospy.Publisher('/right_arm_controller/command', JointTrajectory, queue_size=1)
 
         rospy.Subscriber('/controlState', String, self.cb_control_state, queue_size=1)
-        # rospy.Subscriber('/uiJointpose', JointState, self.cb_joint_control,queue_size=1)
-        rospy.Subscriber('/joint_states', JointState, self.cb_joint_control, queue_size=1)
+        rospy.Subscriber('/uiJointPose', JointState, self.cb_joint_control,queue_size=1)
+        # rospy.Subscriber('/uiJointPose', JointState, self.cb_joint_control, queue_size=1)
         rospy.Subscriber('/uiCartesianPose', Pose, self.cb_cartesion_control, queue_size=1)
         rospy.Subscriber('/joint_states', JointState, self.cb_objective_control, queue_size=1)
         rospy.Subscriber('/gazebo/link_states', LinkStates, self.cb_ee_pose_state, queue_size=1)
@@ -50,16 +50,17 @@ class MultiplexerInterface(object):
         if not self.control_state == 'joint':
             return
 
-        left_arm_names = data.name[:7]
-        left_arm_positions = data.position[:7]
+        # left_arm_names = data.name[:7]
+        # left_arm_positions = data.position[:7]
 
-        right_arm_names = data.name[7:]
-        right_arm_positions = data.position[7:]
+        right_arm_names = data.name
+        right_arm_positions = data.position
 
-        left_msg = self.make_JointTrajectory_from_joints(vals=left_arm_positions, names=left_arm_names)
+        # left_msg = self.make_JointTrajectory_from_joints(vals=left_arm_positions, names=left_arm_names)
         right_msg = self.make_JointTrajectory_from_joints(vals=right_arm_positions, names=right_arm_names)
 
         # self.left_js_pub.publish(left_msg)
+        print(right_msg)
         self.right_js_pub.publish(right_msg)
 
         return
