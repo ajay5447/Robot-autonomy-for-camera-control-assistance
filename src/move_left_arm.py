@@ -56,7 +56,7 @@ class move_arm(object):
 
         JTP_msg = JointTrajectoryPoint()
         JT_msg.header.stamp = rospy.Time.now() + rospy.Duration.from_sec(0.0)
-        JTP_msg.time_from_start = rospy.Duration.from_sec(5.0)
+        JTP_msg.time_from_start = rospy.Duration.from_sec(2.5)
 
         JTP_msg.positions = vals
         JTP_msg.velocities = [0.0] * len(names)
