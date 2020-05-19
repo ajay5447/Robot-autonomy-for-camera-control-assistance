@@ -1,0 +1,36 @@
+{
+  "configurations": [
+    {
+      "browse": {
+        "databaseFilename": "",
+        "limitSymbolsToIncludedHeaders": true
+      },
+      "includePath": [
+        "/home/ajay/catkin_ws/devel/include/**",
+        "/opt/ros/melodic/include/**",
+        "/home/ajay/catkin_ws/src/convenience-pkgs/arm_components_name_manager/include/**",
+        "/home/ajay/catkin_ws/src/autoCam_ROS-Qt/src/autoCam_pkg/include/**",
+        "/home/ajay/catkin_ws/src/convenience-pkgs/baselib_binding/include/**",
+        "/home/ajay/catkin_ws/src/convenience-pkgs/convenience_math_functions/include/**",
+        "/home/ajay/catkin_ws/src/convenience-pkgs/convenience_ros_functions/include/**",
+        "/home/ajay/catkin_ws/src/joint-control-pkgs/gazebo_joint_control/include/**",
+        "/home/ajay/catkin_ws/src/kinova-ros/kinova_moveit/inverse_kinematics_plugins/ikfast/j2n6s300_ikfast/include/**",
+        "/home/ajay/catkin_ws/src/kinova-ros/kinova_moveit/inverse_kinematics_plugins/ikfast/j2s6s300_ikfast/include/**",
+        "/home/ajay/catkin_ws/src/kinova-ros/kinova_moveit/inverse_kinematics_plugins/ikfast/j2s7s300_ikfast/include/**",
+        "/home/ajay/catkin_ws/src/jaco-arm-pkgs/jaco_arm/jaco_joints/include/**",
+        "/home/ajay/catkin_ws/src/joint-control-pkgs/joint_trajectory_execution/include/**",
+        "/home/ajay/catkin_ws/src/kinova-ros/kinova_moveit/kinova_arm_moveit_demo/include/**",
+        "/home/ajay/catkin_ws/src/kinova-ros/kinova_driver/include/**",
+        "/home/ajay/catkin_ws/src/kinova_gen3two_arms/include/**",
+        "/home/ajay/catkin_ws/src/convenience-pkgs/logger_binding/include/**",
+        "/home/ajay/catkin_ws/src/kinova-ros/kinova_moveit/inverse_kinematics_plugins/ikfast/m1n6s300_ikfast/include/**",
+        "/home/ajay/catkin_ws/src/qt_kinova_pkg/include/**",
+        "/home/ajay/catkin_ws/src/roboticArm/include/**",
+        "/home/ajay/catkin_ws/src/roboticArmGazebo/include/**",
+        "/home/ajay/catkin_ws/src/universal_robot/ur_kinematics/include/**",
+        "/usr/include/**"
+      ],
+      "name": "ROS"
+    }
+  ]
+}
