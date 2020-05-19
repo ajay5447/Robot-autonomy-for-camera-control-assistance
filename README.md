@@ -63,4 +63,4 @@ http://scikit-learn.org/stable/index.html
 
 <b> Video demonstration </b>
 
-[![Watch the video]](mp.png)](https://www.youtube.com/watch?v=lwVXYiFdlOc&feature=youtu.be)
+[![Watch the video](mp.png)](https://www.youtube.com/watch?v=lwVXYiFdlOc&feature=youtu.be)
